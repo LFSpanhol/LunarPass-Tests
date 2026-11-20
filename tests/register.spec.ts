@@ -1,0 +1,39 @@
+import { test, expect } from "@playwright/test"
+import { faker } from "@faker-js/faker"
+
+import { LoginPage } from "../pages/login.pages"
+import { Navbar } from "../pages/components/navbar"
+
+test("Deve cadastrar uma nova missão", async ({ page }) => {
+  const loginPage = new LoginPage(page)
+  const navBar = new Navbar(page)
+
+  loginPage.go()
+  await loginPage.login("buzz@lunarpass.dev", "pwd123")
+  await expect(navBar.logout).toBeVisible({timeout: 10000})
+
+  await page.getByRole("link", { name: "Nova missão" }).click()
+  await expect(
+    page.getByRole("heading", { name: "Programar missão" }),
+  ).toBeVisible()
+
+  const missionId = 'LP-' + faker.string.alphanumeric({length: {min: 5, max: 5}, casing: 'upper'})
+
+  await page.getByRole("textbox", { name: "ID da missão" }).fill(missionId)
+  await page.getByRole("textbox", { name: "Foguete" }).fill("Starship")
+  await page.getByLabel("Base lunar").selectOption("aurora")
+  await page
+    .getByRole("textbox", { name: "Data de partida" })
+    .fill("2028-01-20")
+  await expect(page.getByTestId("mission-form-return-date")).toContainText(
+    "27 de jan. de 2028",
+  )
+  await page
+    .getByRole("spinbutton", { name: "Preço por passagem (USD)" })
+    .fill("1000")
+
+  await page.getByRole("button", { name: "Salvar missão" }).click()
+  await expect(page.getByRole("listitem")).toContainText(
+    "A nova missão foi adicionada ao catálogo e já está disponível para reservas.",
+  )
+})
