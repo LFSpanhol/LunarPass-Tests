@@ -8,6 +8,25 @@ import { DashPage } from "../pages/dash.page"
 import { RegisterPage } from "../pages/register.page"
 import { Toast } from "../pages/components/toast"
 
+let loginPage: LoginPage
+let dashPage: DashPage
+let registerPage: RegisterPage
+let navBar: Navbar
+let toast: Toast
+
+test.beforeEach(async ({ page }) => {
+  loginPage = new LoginPage(page)
+  dashPage = new DashPage(page)
+  registerPage = new RegisterPage(page)
+
+  navBar = new Navbar(page)
+  toast = new Toast(page)
+
+  await loginPage.go()
+  await loginPage.login("buzz@lunarpass.dev", "pwd123")
+  await expect(navBar.logout).toBeVisible({timeout: 15000})
+})
+
 test("Deve cadastrar uma nova missão", async ({ page }) => {
   const mission: Mission ={
     id: 'LP-' + faker.string.alphanumeric({length: {min: 5, max: 5}, casing: 'upper'}),
@@ -17,15 +36,6 @@ test("Deve cadastrar uma nova missão", async ({ page }) => {
     returnDate: '27 de jan. de 2028',
     price: '15000'
   }
-  const loginPage = new LoginPage(page)
-  const dashPage = new DashPage(page)
-  const registerPage = new RegisterPage(page)
-  const navBar = new Navbar(page)
-  const toast = new Toast(page)
-
-  loginPage.go()
-  await loginPage.login("buzz@lunarpass.dev", "pwd123")
-  await expect(navBar.logout).toBeVisible({timeout: 15000})
 
   await dashPage.addbutton.click()
   await expect(registerPage.title).toBeVisible()
@@ -44,14 +54,6 @@ test("Não deve cadastrar com o código da missão incorreto", async ({ page }) 
     returnDate: '27 de jan. de 2028',
     price: '15000'
   }
-  const loginPage = new LoginPage(page)
-  const dashPage = new DashPage(page)
-  const registerPage = new RegisterPage(page)
-  const navBar = new Navbar(page)
-
-  loginPage.go()
-  await loginPage.login("buzz@lunarpass.dev", "pwd123")
-  await expect(navBar.logout).toBeVisible({timeout: 15000})
 
   await dashPage.addbutton.click()
   await expect(registerPage.title).toBeVisible()
