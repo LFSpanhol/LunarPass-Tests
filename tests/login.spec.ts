@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test"
 
-import { LoginPage } from "../pages/login.pages"
+import { LoginPage } from "../pages/login.page"
 import { Navbar } from "../pages/components/navbar"
 
 let loginPage: LoginPage

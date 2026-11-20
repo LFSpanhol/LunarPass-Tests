@@ -1,9 +1,12 @@
 import { test, expect } from "@playwright/test"
 import { faker } from "@faker-js/faker"
 
-import { LoginPage } from "../pages/login.pages"
+import { LoginPage } from "../pages/login.page"
 import { Navbar } from "../pages/components/navbar"
 import { Mission } from "../support/mission"
+import { DashPage } from "../pages/dash.page"
+import { RegisterPage } from "../pages/register.page"
+import { Toast } from "../pages/components/toast"
 
 test("Deve cadastrar uma nova missão", async ({ page }) => {
 
@@ -16,22 +19,19 @@ test("Deve cadastrar uma nova missão", async ({ page }) => {
     price: '15000'
   }
   const loginPage = new LoginPage(page)
+  const dashPage = new DashPage(page)
+  const registerPage = new RegisterPage(page)
   const navBar = new Navbar(page)
+  const toast = new Toast(page)
 
   loginPage.go()
   await loginPage.login("buzz@lunarpass.dev", "pwd123")
   await expect(navBar.logout).toBeVisible({timeout: 10000})
 
-  await page.getByRole("link", { name: "Nova missão" }).click()
-  await expect(page.getByRole("heading", { name: "Programar missão" })).toBeVisible()
-
-  await page.getByRole("textbox", { name: "ID da missão" }).fill(mission.id)
-  await page.getByRole("textbox", { name: "Foguete" }).fill(mission.rocket)
-  await page.getByLabel("Base lunar").selectOption(mission.lunarBase)
-  await page.getByRole("textbox", { name: "Data de partida" }).fill(mission.departureDate)
-  await expect(page.getByTestId("mission-form-return-date")).toContainText(mission.returnDate)
-  await page.getByRole("spinbutton", { name: "Preço por passagem (USD)" }).fill(mission.price)
-  await page.getByRole("button", { name: "Salvar missão" }).click()
-  await expect(page.getByRole("listitem")).toContainText("A nova missão foi adicionada ao catálogo e já está disponível para reservas.",
+  await dashPage.addbutton.click()
+  await expect(registerPage.title).toBeVisible()
+  await registerPage.submit(mission)
+  
+  await expect(toast.message).toContainText("A nova missão foi adicionada ao catálogo e já está disponível para reservas.",
   )
 })
