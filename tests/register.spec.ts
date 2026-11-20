@@ -61,3 +61,20 @@ test("Não deve cadastrar com o código da missão incorreto", async ({ page }) 
   
   await expect(registerPage.alert).toHaveText("Use o formato LP-0000")
 })
+
+test("Não deve cadastrar com o código da missão já existente", async ({ page }) => {
+  const mission: Mission ={
+    id: 'LP-0127A',
+    rocket: 'Starship',
+    lunarBase: 'aurora',
+    departureDate: '2028-01-20',
+    returnDate: '27 de jan. de 2028',
+    price: '15000'
+  }
+
+  await dashPage.addbutton.click()
+  await expect(registerPage.title).toBeVisible()
+  await registerPage.submit(mission)
+  
+  await expect(registerPage.alert).toHaveText("Já existe uma missão com este ID.")
+})
