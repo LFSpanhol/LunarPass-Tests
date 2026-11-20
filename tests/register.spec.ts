@@ -9,7 +9,6 @@ import { RegisterPage } from "../pages/register.page"
 import { Toast } from "../pages/components/toast"
 
 test("Deve cadastrar uma nova missão", async ({ page }) => {
-
   const mission: Mission ={
     id: 'LP-' + faker.string.alphanumeric({length: {min: 5, max: 5}, casing: 'upper'}),
     rocket: 'Starship',
@@ -26,7 +25,7 @@ test("Deve cadastrar uma nova missão", async ({ page }) => {
 
   loginPage.go()
   await loginPage.login("buzz@lunarpass.dev", "pwd123")
-  await expect(navBar.logout).toBeVisible({timeout: 10000})
+  await expect(navBar.logout).toBeVisible({timeout: 15000})
 
   await dashPage.addbutton.click()
   await expect(registerPage.title).toBeVisible()
@@ -34,4 +33,29 @@ test("Deve cadastrar uma nova missão", async ({ page }) => {
   
   await expect(toast.message).toContainText("A nova missão foi adicionada ao catálogo e já está disponível para reservas.",
   )
+})
+
+test("Não deve cadastrar com o código da missão incorreto", async ({ page }) => {
+  const mission: Mission ={
+    id: faker.string.alphanumeric({length: {min: 5, max: 5}, casing: 'upper'}),
+    rocket: 'Starship',
+    lunarBase: 'aurora',
+    departureDate: '2028-01-20',
+    returnDate: '27 de jan. de 2028',
+    price: '15000'
+  }
+  const loginPage = new LoginPage(page)
+  const dashPage = new DashPage(page)
+  const registerPage = new RegisterPage(page)
+  const navBar = new Navbar(page)
+
+  loginPage.go()
+  await loginPage.login("buzz@lunarpass.dev", "pwd123")
+  await expect(navBar.logout).toBeVisible({timeout: 15000})
+
+  await dashPage.addbutton.click()
+  await expect(registerPage.title).toBeVisible()
+  await registerPage.submit(mission)
+  
+  await expect(registerPage.alert).toHaveText("Use o formato LP-0000")
 })
